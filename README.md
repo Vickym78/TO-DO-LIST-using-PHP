@@ -1,195 +1,83 @@
-# TO-DO-LIST-using-PHP
-<?php
+# ToDo App
 
-$server='localhost';
-$username='root';
-$password='';
-$database='todo_masters';
+This is a simple ToDo application built with PHP for the backend, utilizing MySQL for the database. The application allows users to perform CRUD (Create, Read, Update, Delete) operations on their tasks.
 
-$conn = mysqli_connect($server,$username,$password,$database);
+## Features
 
-if($conn -> connect_errno){
-    die('Connection to MySQL failed : ' .$conn ->connect_error);
-}
+- **Create**: Add new tasks to your to-do list.
+- **Read**: View all tasks.
+- **Update**: Edit existing tasks.
+- **Delete**: Remove tasks from the list.
 
-//Creating ITEM
-//var_dump($_POST);
-if(isset($_POST['add'])){
-    $item=$_POST['item'];
-    if(!empty($item)){
-        $query="INSERT INTO todo(naame) VALUES('$item')";
-        if(mysqli_query($conn,$query)){
-            echo'
-            <center>
-    <div class="alert alert-success" role="alert">
-        Item Added Succesfully
-    </div>
-    </center>
-            ';
-        } else{
-            echo mysqli_error($conn);
-        }
+## Requirements
 
+- PHP 7.4 or higher
+- MySQL 5.7 or higher
+- XAMPP (recommended for local development)
 
+## Installation
 
-    }
+### Step 1: Download and Install XAMPP
 
-    }
+1. Download XAMPP from the [official website](https://www.apachefriends.org/index.html).
+2. Follow the installation instructions for your operating system.
 
-    //Checking I f action parameter is filled
+### Step 2: Set Up the Database
 
-    if(isset($_GET['action'])){
-        $itemId=$_GET['item'];
-        if($_GET['action']=='done'){
-            $query="UPDATE todo SET status = 1 WHERE id='$itemId'";
-            if(mysqli_query($conn,$query)){
-                echo'
-                <center>
-        <div class="alert alert-info" role="alert">
-            Item Marked Done
-        </div>
-        </center>
-                ';
-            } else{
-                echo mysqli_error($conn);
-            }
-    
-    
-        } else if($_GET['action']=='delete'){
-            $query=" DELETE FROM todo WHERE id= '$itemId' ";
-            if(mysqli_query($conn,$query)){
-                echo'
-                <center>
-                <div class="alert alert-danger" role="alert">
-                Item Deleted Succesfully
-                 </div>
-            </center>
-                ';
-            } else{
-                echo mysqli_error($conn);
-            }
-            
-        } 
-    }
-    
-    
+1. Start XAMPP and ensure that Apache and MySQL are running.
+2. Open phpMyAdmin by navigating to `http://localhost/phpmyadmin` in your browser.
+3. Create a new database called `todo_app`.
+4. Run the following SQL script to create the `tasks` table:
 
+```sql
+CREATE TABLE `tasks` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL,
+  `description` text,
+  `status` varchar(50) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+```
+### Step 3: Configure the Project
 
+1. Download the project files and place them in the `htdocs` directory of your XAMPP installation.
+2. Rename `config.example.php` to `config.php`.
+3. Open `config.php` and update the database configuration to match your setup:
 
-?>
+    ```php
+    <?php
+    $host = 'localhost';
+    $dbname = 'todo_app';
+    $username = 'root';
+    $password = ''; // Default XAMPP MySQL password is empty
+    ?>
+    ```
 
+### Step 4: Run the Application
 
+1. Open your browser and navigate to `http://localhost/todo-app` (assuming the project folder is named `todo-app`).
+2. You should see the ToDo App homepage where you can start adding tasks.
 
+## Usage
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TO DO list Appllication</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+### Adding a Task
 
-    <style>
-        .done{
-            text-decoration: line-through;
-        }
-    </style>
-</head>
-<body>
-    <main>
-<!-- <center>
-   <div class="alert alert-success" role="alert">
-        Item Added Succesfully
-    </div>
-    <div class="alert alert-info" role="alert">
-        Item Marked as Done
-    </div>
-    <div class="alert alert-danger" role="alert">
-        Item Deleted Succesfully
-    </div>
-</center>
--->
+1. Go to the homepage.
+2. Fill out the form with the task title and description.
+3. Click "Add Task".
 
+### Viewing Tasks
 
-    <div class="container pt-5">
-        <div class="row">
-            <div class="col-sm-12 col-md-3"></div>
-            <div class="col-sm-12 col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <p>TODO List</p>
-             </div>
-             <div class="card-body">
+- All tasks will be listed on the homepage.
 
-             <form method="post" action="<?= $_SERVER['PHP_SELF']?>">
-        <div class="mb-3">
-            <input type="text" class="form-control" name="item" placeholder="Add a TO DO Item">
-        </div>
-        <input type="submit" class="btn-dark" name="add" value="Add Item">
+### Editing a Task
 
-</form>
-     
+1. Click the "Edit" button next to the task you want to update.
+2. Modify the task details in the form.
+3. Click "Update Task".
 
-<?php 
-            $query= "SELECT * FROM todo";
-           $result= mysqli_query($conn, $query);
-           if($result->num_rows>0){
-                $i=1;
-            while($row=$result->fetch_assoc())
-            {
-                $done=$row['status']==1 ? "done": "";
-                echo '<br>
-                            <div class="row mt-4">
-                            <div class="col-sm-12 col-md-1"><h4>'.$i.'.</h4></div>
-                           <div class="col-sm-12 col-md-6"><h5  class="'.$done.'">'.$row['naame'].'</h5></div>
-                           <div class="col-sm-12 col-md-5">
+### Deleting a Task
 
-                               <a href="?action=done&item='.$row['id'].'" class="btn btn-outline-dark">Mark as Done</a>
-                               <a href="?action=delete&item='.$row['id'].'"  class="btn btn-outline-danger">Delete</a>
-                           </div>
-                           </div> ';
-                           $i++;
-            }
-} else{
-    echo'
-    <center>
-           <img src="folder.png" width="50px" alt="Empty List"><br> <span>Your List is Empty</span>
-        </center>
-    ';
-}
-
-        
-        
-        ?>
-
-            
-        
-
-    </div>
-    </div>
-        </div>
-        </div>
-        </div>
-    </div>
-
-    </main>
-    
-
-
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
-    <script>
-        $(document).ready(function(){
-            $(".alert").fadeTo(5000,500).slideUp(500,function(){
-                $('.alert').slideUp(500)
-
-
-            })
-
-        })
-    </script>
-</body>
-</html>
+1. Click the "Delete" button next to the task you want to remove.
+2. Confirm the deletion.
